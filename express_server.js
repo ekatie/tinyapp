@@ -19,7 +19,6 @@ const generateRandomString = function () {
   return randomId;
 };
 
-
 // Get requests
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -50,8 +49,12 @@ app.get("/hello", (req, res) => {
 
 // Post requests
 app.post('/urls', (req, res) => {
-  console.log(req.body);
-  res.send('ok');
+  const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
+
+  urlDatabase[shortURL] = longURL;
+
+  res.redirect(`/urls/${shortURL}`);
 });
 
 // Listen
