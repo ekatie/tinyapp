@@ -14,11 +14,18 @@
 
 
     <div class="align-right" id="navbarNavAltMarkup">
+      <% if(!username) { %>
       <form method="POST" action="/login">
         <input type="text" name="username" label="New URL" placeholder="Username">
         <button type="submit" class="btn btn-outline-dark">Login
         </button>
       </form>
+      <% } else { %>
+        Signed in as <%= username %>
+        <form method="POST" action="/logout">
+          <button type="submit" class="btn btn-outline-danger">Logout</button>
+        </form>
+        <% } %>
     </div>
   </nav>
 </header>
