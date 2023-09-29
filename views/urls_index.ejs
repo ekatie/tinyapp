@@ -36,6 +36,7 @@
             </td>
             <td>
               <form method="POST" action="/urls/<%= id%>/delete">
+                <input type="hidden" name="id" value="<%= id %>">
                 <button type="submit" class="btn btn-danger">Delete</button>
               </form>
             </td>
