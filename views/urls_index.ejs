@@ -36,12 +36,12 @@
               <%= urls[id] %>
             </td>
             <td>
-              <a href="/urls/<%= id %>" class="btn btn-primary">Edit</a>
+              <a href="/urls/<%= id %>" class="btn btn-outline-primary">Edit</a>
             </td>
             <td>
               <form method="POST" action="/urls/<%= id%>/delete">
                 <input type="hidden" name="id" value="<%= id %>">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-outline-danger">Delete</button>
               </form>
             </td>
           </tr>
