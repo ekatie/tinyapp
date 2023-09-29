@@ -66,6 +66,11 @@ app.post('/urls/:id/edit', (req, res) => {
   res.redirect('/urls');
 });
 
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
+});
+
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
