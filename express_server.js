@@ -31,10 +31,6 @@ const generateRandomString = function () {
 };
 
 // Get requests
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id];
   if (!longURL) {
@@ -45,7 +41,10 @@ app.get('/u/:id', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = {
+    user_id: req.cookies.user_id,
+    users
+  };
   res.render("urls_new", templateVars);
 });
 
@@ -53,26 +52,35 @@ app.get('/urls/:id', (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]
+    user_id: req.cookies.user_id,
+    users
   };
   res.render('urls_show', templateVars);
 });
 
 app.get('/register', (req, res) => {
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = {
+    user_id: req.cookies.user_id,
+    users
+  };
   res.render('register', templateVars);
 });
 
 app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user_id: req.cookies.user_id,
+    users
   };
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+app.get("/hello", (req, res) => {
+  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.get("/", (req, res) => {
@@ -107,17 +115,16 @@ app.post('/register', (req, res) => {
     password: req.body.password
   };
   res.cookie('user_id', userId);
-  console.log("users:", users);
   res.redirect('/urls');
 });
 
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
+  res.cookie('user_id', userId);
   res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
