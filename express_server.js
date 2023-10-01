@@ -12,6 +12,15 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  /* sample data format:
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  }*/
+};
+
 const generateRandomString = function () {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let randomId = '';
@@ -88,6 +97,18 @@ app.post('/urls', (req, res) => {
   urlDatabase[shortURL] = longURL;
 
   res.redirect(`/urls/${shortURL}`);
+});
+
+app.post('/register', (req, res) => {
+  const userId = generateRandomString();
+  users[userId] = {
+    userId: userId,
+    email: req.body.email,
+    password: req.body.password
+  };
+  res.cookie('user_id', userId);
+  console.log("users:", users);
+  res.redirect('/urls');
 });
 
 app.post('/login', (req, res) => {
