@@ -49,6 +49,11 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+app.get('/register', (req, res) => {
+  const templateVars = { username: req.cookies["username"] };
+  res.render('register', templateVars);
+});
+
 app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
@@ -66,21 +71,19 @@ app.get("/", (req, res) => {
 });
 
 // Post requests
-app.post('/urls/:id/delete', (req, res) => {
-  delete urlDatabase[req.body.id];
+app.post('/urls/:id/edit', (req, res) => {
+  urlDatabase[req.params.id] = req.body.longURL;
   res.redirect('/urls');
 });
 
-app.post('/urls/:id/edit', (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
+app.post('/urls/:id/delete', (req, res) => {
+  delete urlDatabase[req.body.id];
   res.redirect('/urls');
 });
 
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
-
-  console.log(shortURL, longURL);
 
   urlDatabase[shortURL] = longURL;
 
