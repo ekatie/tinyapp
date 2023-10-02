@@ -12,13 +12,32 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const users = {
+const userDatabase = {
   /* sample data format:
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
     password: "purple-monkey-dinosaur",
   }*/
+};
+
+const findUserByEmail = function (email) {
+  for (const userId in userDatabase) {
+    if (userDatabase[userId].email === email) {
+      return userDatabase[userId];
+    } else {
+      return null;
+    }
+  }
+};
+
+const authenticateUser = function (email, password) {
+  for (const userId in userDatabase) {
+    if (userDatabase[userId].email === email && userDatabase[userId].password === password) {
+      return userDatabase[userId];
+    }
+  }
+  return false;
 };
 
 const generateRandomString = function () {
@@ -43,7 +62,7 @@ app.get('/u/:id', (req, res) => {
 app.get('/urls/new', (req, res) => {
   const templateVars = {
     user_id: req.cookies.user_id,
-    users
+    userDatabase
   };
   res.render("urls_new", templateVars);
 });
@@ -53,7 +72,7 @@ app.get('/urls/:id', (req, res) => {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
     user_id: req.cookies.user_id,
-    users
+    userDatabase
   };
   res.render('urls_show', templateVars);
 });
@@ -61,7 +80,7 @@ app.get('/urls/:id', (req, res) => {
 app.get('/register', (req, res) => {
   const templateVars = {
     user_id: req.cookies.user_id,
-    users
+    userDatabase
   };
   res.render('register', templateVars);
 });
@@ -70,7 +89,7 @@ app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
     user_id: req.cookies.user_id,
-    users
+    userDatabase
   };
   res.render('urls_index', templateVars);
 });
@@ -108,19 +127,31 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  const userId = generateRandomString();
-  users[userId] = {
-    userId: userId,
-    email: req.body.email,
-    password: req.body.password
+  const existingUser = findUserByEmail(req.body.email);
+  if (req.body.email === '' || req.body.password === '') {
+    return res.status(400).send('Invalid email or password entered!');
+  } else if (existingUser) {
+    return res.status(400).send('This email is already registered!');
+  } else {
+    const userId = generateRandomString();
+    userDatabase[userId] = {
+      id: userId,
+      email: req.body.email,
+      password: req.body.password
+    };
+    res.cookie('user_id', userId);
+    res.redirect('/urls');
   };
-  res.cookie('user_id', userId);
-  res.redirect('/urls');
 });
 
 app.post('/login', (req, res) => {
-  res.cookie('user_id', userId);
-  res.redirect('/urls');
+  const user = authenticateUser(req.body.email, req.body.password);
+  if (!user) {
+    res.status(401).send("Authentication failed");
+  } else {
+    res.cookie('user_id', user.id);
+    res.redirect('/urls');
+  }
 });
 
 app.post('/logout', (req, res) => {
