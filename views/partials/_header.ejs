@@ -14,11 +14,11 @@
 
     <div class="btn-group ml-auto" id="navbarNavAltMarkup">
       <% if(!user_id) { %>
-        <form method="GET" action="/register">
-          <button type="submit" class="btn btn-dark">Register</button>
+        <form class="form-inline" method="GET" action="/register">
+          <button type="submit" class="btn btn-outline-dark">Register</button>
         </form>
-        <form method="GET" action="/login">
-          <button type="submit" class="btn btn-outline-dark">Login</button>
+        <form class="form-inline" method="GET" action="/login">
+          <button type="submit" class="btn btn-outline-secondary">Login</button>
         </form>
         <% } else if (userDatabase[user_id]) { %>
           <form method="POST" action="/logout">
