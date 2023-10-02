@@ -23,7 +23,7 @@
           <button type="submit" class="btn btn-outline-dark">Login
           </button>
         </form>
-        <% } else { %>
+        <% } else if (userDatabase[user_id]) { %>
           <form method="POST" action="/logout">
             Signed in as: <%= userDatabase[user_id].email %>
               <button type="submit" class="btn btn-outline-dark">Logout</button>
