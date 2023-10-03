@@ -12,14 +12,10 @@
       </div>
     </div>
 
-    <div class="btn-group ml-auto" id="navbarNavAltMarkup">
+    <div class="d-flex justify-content-end navbar-nav" id="navbarNavAltMarkup">
       <% if(!user_id) { %>
-        <form class="form-inline" method="GET" action="/register">
-          <button type="submit" class="btn btn-outline-dark">Register</button>
-        </form>
-        <form class="form-inline" method="GET" action="/login">
-          <button type="submit" class="btn btn-outline-secondary">Login</button>
-        </form>
+        <a class="nav-item nav-link" href="/login">Login</a>
+        <a class="nav-item nav-link" href="/register">Register</a>
         <% } else if (userDatabase[user_id]) { %>
           <form method="POST" action="/logout">
             Signed in as: <%= userDatabase[user_id].email %>
