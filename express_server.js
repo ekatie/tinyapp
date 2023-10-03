@@ -66,11 +66,16 @@ app.get('/u/:id', (req, res) => {
 
 // View page to generate new short URL
 app.get('/urls/new', (req, res) => {
-  const templateVars = {
-    user_id: req.cookies.user_id,
-    userDatabase
-  };
-  res.render("urls_new", templateVars);
+  // If not logged in, redirect user to login page
+  if (!req.cookies.user_id) {
+    res.redirect('/login');
+  } else {
+    const templateVars = {
+      user_id: req.cookies.user_id,
+      userDatabase
+    };
+    res.render("urls_new", templateVars);
+  }
 });
 
 // View single long URL and short URL information
@@ -86,20 +91,30 @@ app.get('/urls/:id', (req, res) => {
 
 // View registration page for new users
 app.get('/register', (req, res) => {
-  const templateVars = {
-    user_id: req.cookies.user_id,
-    userDatabase
+  // If logged in, redirect
+  if (req.cookies.user_id) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = {
+      user_id: req.cookies.user_id,
+      userDatabase
+    };
+    res.render('register', templateVars);
   };
-  res.render('register', templateVars);
 });
 
 // View existing user login page
 app.get('/login', (req, res) => {
-  const templateVars = {
-    user_id: req.cookies.user_id,
-    userDatabase
-  };
-  res.render('login', templateVars);
+  // If logged in, redirect
+  if (req.cookies.user_id) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = {
+      user_id: req.cookies.user_id,
+      userDatabase
+    };
+    res.render('login', templateVars);
+  }
 });
 
 // View all short/long URLs
@@ -140,12 +155,17 @@ app.post('/urls/:id/delete', (req, res) => {
 
 // Generate new short URL for new long URL
 app.post('/urls', (req, res) => {
-  const shortURL = generateRandomString();
-  const longURL = req.body.longURL;
+  if (!req.cookies.user_id) {
+    res.send("You must be signed in to use this feature!\n");
+  } else {
 
-  urlDatabase[shortURL] = longURL;
+    const shortURL = generateRandomString();
+    const longURL = req.body.longURL;
 
-  res.redirect(`/urls/${shortURL}`);
+    urlDatabase[shortURL] = longURL;
+
+    res.redirect(`/urls/${shortURL}`);
+  }
 });
 
 // Register a new user account
