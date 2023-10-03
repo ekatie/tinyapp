@@ -150,17 +150,24 @@ app.post('/urls', (req, res) => {
 
 // Register a new user account
 app.post('/register', (req, res) => {
-  const existingUser = findUserByEmail(req.body.email);
-  if (req.body.email === '' || req.body.password === '') {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // No email or password entered
+  if (!email || !password) {
     return res.status(400).send('Invalid email or password entered!');
-  } else if (existingUser) {
-    return res.status(400).send('This email is already registered!');
-  } else {
+  }
+  // Email already registered
+  else if (findUserByEmail(email)) {
+    return res.status(400).send('The email entered is already registered!');
+  }
+  // Register new user account
+  else {
     const userId = generateRandomString();
     userDatabase[userId] = {
       id: userId,
-      email: req.body.email,
-      password: req.body.password
+      email: email,
+      password: password
     };
     res.cookie('user_id', userId);
     res.redirect('/urls');
@@ -169,13 +176,23 @@ app.post('/register', (req, res) => {
 
 // Login to existing user account
 app.post('/login', (req, res) => {
-  const existingUser = findUserByEmail(req.body.email);
-  if (!existingUser) {
-    return res.status(403).send('This email is not registered!');
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // No email entered
+  if (!email) {
+    return res.status(403).send('Invalid email address!');
   }
-  const validUser = authenticateUser(req.body.email, req.body.password);
+
+  // Email not registered
+  if (!findUserByEmail(email)) {
+    return res.status(403).send('The email entered is not registered!');
+  }
+
+  // Check if email and password combination matches user database
+  const validUser = authenticateUser(email, password);
   if (!validUser) {
-    res.status(403).send("Authentication failed");
+    res.status(403).send("Authentication failed!");
   } else {
     res.cookie('user_id', validUser.id);
     res.redirect('/urls');
