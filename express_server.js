@@ -80,6 +80,11 @@ app.get('/urls/new', (req, res) => {
 
 // View single long URL and short URL information
 app.get('/urls/:id', (req, res) => {
+  // If id doesn't exist
+  if (!req.params.id) {
+    res.send("This url does not exist!\n");
+  }
+
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
