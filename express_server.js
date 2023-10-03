@@ -8,17 +8,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca",
+    userId: "aJ48lW"
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+    userId: "aJ48lW"
+  }
 };
 
 const userDatabase = {
-  /* sample data format:
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
-  }*/
+  aJ48lW: {
+    id: "aJ48lW",
+    email: "test@gmail.com",
+    password: "test",
+  }
 };
 
 // Check if email is in user database
@@ -56,7 +61,7 @@ const generateRandomString = function () {
 
 // Forward to long URL using short URL
 app.get('/u/:id', (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
   if (!longURL) {
     res.send("URL does not exist");
   } else {
@@ -87,7 +92,7 @@ app.get('/urls/:id', (req, res) => {
 
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user_id: req.cookies.user_id,
     userDatabase
   };
@@ -148,7 +153,8 @@ app.get("/", (req, res) => {
 
 // Edit existing long URL
 app.post('/urls/:id/edit', (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
+  console.log("params", req.params, "body", req.body);
+  urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect('/urls');
 });
 
@@ -167,7 +173,10 @@ app.post('/urls', (req, res) => {
     const shortURL = generateRandomString();
     const longURL = req.body.longURL;
 
-    urlDatabase[shortURL] = longURL;
+    urlDatabase[shortURL] = {
+      "longURL": longURL,
+      "userId": req.cookies.user_id
+    };
 
     res.redirect(`/urls/${shortURL}`);
   }
