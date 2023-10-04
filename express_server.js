@@ -75,7 +75,7 @@ const urlsForUser = function (id) {
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id].longURL;
   if (!longURL) {
-    res.send("URL does not exist");
+    res.send("Invalid URL!");
   } else {
     res.redirect(longURL);
   }
@@ -83,7 +83,7 @@ app.get('/u/:id', (req, res) => {
 
 // View page to generate new short URL
 app.get('/urls/new', (req, res) => {
-  // If not logged in, redirect user to login page
+  // User not logged in, redirect user to login page
   if (!req.cookies.user_id) {
     res.redirect('/login');
   } else {
@@ -101,15 +101,15 @@ app.get('/urls/:id', (req, res) => {
   const userId = req.cookies.user_id;
   const userURLs = urlsForUser(userId);
 
-  // If not logged in
+  // User not logged in
   if (!userId) {
     res.send("You must be signed in to view URL details!\n");
   }
-  // If id doesn't exist
+  // URL doesn't exist
   else if (!urlId) {
-    res.send("This url does not exist!\n");
+    res.send("Invalid URL!\n");
   }
-  // If user doesn't own URL
+  // User doesn't own URL
   else if (!userURLs[urlId]) {
     res.send("You do not have access to this URL!\n");
   } else {
@@ -125,7 +125,7 @@ app.get('/urls/:id', (req, res) => {
 
 // View registration page for new users
 app.get('/register', (req, res) => {
-  // If logged in, redirect
+  // Redirect logged in user
   if (req.cookies.user_id) {
     res.redirect('/urls');
   } else {
@@ -139,7 +139,7 @@ app.get('/register', (req, res) => {
 
 // View existing user login page
 app.get('/login', (req, res) => {
-  // If logged in, redirect
+  // Redirect logged in user
   if (req.cookies.user_id) {
     res.redirect('/urls');
   } else {
@@ -153,7 +153,7 @@ app.get('/login', (req, res) => {
 
 // View all short/long URLs
 app.get('/urls', (req, res) => {
-  // If not logged in
+  // User not logged in
   if (!req.cookies.user_id) {
     res.send("You must be signed in to view existing URLs!\n");
   } else {
@@ -184,18 +184,53 @@ app.get("/", (req, res) => {
 
 // Edit existing long URL
 app.post('/urls/:id/edit', (req, res) => {
-  urlDatabase[req.params.id].longURL = req.body.longURL;
-  res.redirect('/urls');
+  const urlId = req.params.id;
+  const userId = req.cookies.user_id;
+  const userURLs = urlsForUser(userId);
+
+  // URL doesn't exist
+  if (!urlId) {
+    res.send("Invalid URL!\n");
+  }
+  // User not logged in
+  else if (!userId) {
+    res.send("You must be signed in to view existing URLs!\n");
+  }
+  // User doesn't own URL
+  else if (!userURLs[urlId]) {
+    res.send("You do not have permission to edit this URL!\n");
+  } else {
+    urlDatabase[req.params.id].longURL = req.body.longURL;
+    res.redirect('/urls');
+  }
 });
 
 // Delete existing long URL
 app.post('/urls/:id/delete', (req, res) => {
-  delete urlDatabase[req.body.id];
-  res.redirect('/urls');
+  const urlId = req.params.id;
+  const userId = req.cookies.user_id;
+  const userURLs = urlsForUser(userId);
+
+  // URL doesn't exist
+  if (!urlId) {
+    res.send("Invalid URL!!\n");
+  }
+  // User not logged in
+  else if (!userId) {
+    res.send("You must be signed in to view existing URLs!\n");
+  }
+  // User doesn't own URL
+  else if (!userURLs[urlId]) {
+    res.send("You do not have permission to delete this URL!\n");
+  } else {
+    delete urlDatabase[req.body.id];
+    res.redirect('/urls');
+  }
 });
 
 // Generate new short URL for new long URL
 app.post('/urls', (req, res) => {
+  // User not logged in
   if (!req.cookies.user_id) {
     res.send("You must be signed in to use this feature!\n");
   } else {
