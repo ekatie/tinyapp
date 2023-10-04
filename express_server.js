@@ -158,7 +158,7 @@ app.get('/urls', (req, res) => {
     res.send("You must be signed in to view existing URLs!\n");
   } else {
     const userURLs = urlsForUser(req.cookies.user_id);
-    console.log(userURLs);
+
     const templateVars = {
       urls: userURLs,
       user_id: req.cookies.user_id,
@@ -184,7 +184,6 @@ app.get("/", (req, res) => {
 
 // Edit existing long URL
 app.post('/urls/:id/edit', (req, res) => {
-  console.log("params", req.params, "body", req.body);
   urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect('/urls');
 });
