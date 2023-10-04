@@ -57,6 +57,18 @@ const generateRandomString = function () {
   return randomId;
 };
 
+// Check for users URLs
+const urlsForUser = function (id) {
+  const usersURLs = {};
+  for (const url in urlDatabase) {
+    if (urlDatabase[url].userId === id) {
+      usersURLs[url] = urlDatabase[url];
+    }
+  }
+  return usersURLs;
+};
+
+
 // GET requests
 
 // Forward to long URL using short URL
@@ -85,18 +97,30 @@ app.get('/urls/new', (req, res) => {
 
 // View single long URL and short URL information
 app.get('/urls/:id', (req, res) => {
+  const urlId = req.params.id;
+  const userId = req.cookies.user_id;
+  const userURLs = urlsForUser(userId);
+
+  // If not logged in
+  if (!userId) {
+    res.send("You must be signed in to view URL details!\n");
+  }
   // If id doesn't exist
-  if (!req.params.id) {
+  else if (!urlId) {
     res.send("This url does not exist!\n");
   }
-
-  const templateVars = {
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
-    user_id: req.cookies.user_id,
-    userDatabase
-  };
-  res.render('urls_show', templateVars);
+  // If user doesn't own URL
+  else if (!userURLs[urlId]) {
+    res.send("You do not have access to this URL!\n");
+  } else {
+    const templateVars = {
+      id: urlId,
+      longURL: urlDatabase[urlId].longURL,
+      user_id: userId,
+      userDatabase
+    };
+    res.render('urls_show', templateVars);
+  }
 });
 
 // View registration page for new users
@@ -129,12 +153,19 @@ app.get('/login', (req, res) => {
 
 // View all short/long URLs
 app.get('/urls', (req, res) => {
-  const templateVars = {
-    urls: urlDatabase,
-    user_id: req.cookies.user_id,
-    userDatabase
-  };
-  res.render('urls_index', templateVars);
+  // If not logged in
+  if (!req.cookies.user_id) {
+    res.send("You must be signed in to view existing URLs!\n");
+  } else {
+    const userURLs = urlsForUser(req.cookies.user_id);
+    console.log(userURLs);
+    const templateVars = {
+      urls: userURLs,
+      user_id: req.cookies.user_id,
+      userDatabase
+    };
+    res.render('urls_index', templateVars);
+  }
 });
 
 app.get("/urls.json", (req, res) => {
