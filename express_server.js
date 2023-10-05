@@ -1,8 +1,13 @@
 const express = require("express");
 const bcrypt = require('bcryptjs');
+const {
+  findUserByEmail,
+  authenticateUser,
+  generateRandomString
+} = require('./helpers');
 const cookieSession = require('cookie-session');
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
@@ -10,6 +15,8 @@ app.use(cookieSession({
   name: 'session',
   keys: ['omgmyfirstsecretkey', 'thisisbananas', 'ihavesomanysecrets', 'thisisgoingtobesecureashell']
 }));
+
+// Databases
 
 const urlDatabase = {
   "b2xVn2": {
@@ -30,36 +37,6 @@ const userDatabase = {
   }
 };
 
-// Check if email is in user database
-const findUserByEmail = function (email) {
-  for (const userId in userDatabase) {
-    if (userDatabase[userId].email === email) {
-      return userDatabase[userId];
-    }
-  }
-  return null;
-};
-
-// Check for correct email and password combination
-const authenticateUser = function (email, password) {
-  for (const userId in userDatabase) {
-    if (userDatabase[userId].email === email && bcrypt.compareSync(password, userDatabase[userId].password)) {
-      return userDatabase[userId];
-    }
-  }
-  return false;
-};
-
-// Create URL or user ID
-const generateRandomString = function () {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomId = '';
-  for (let i = 0; i < 6; i++) {
-    randomId += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return randomId;
-};
-
 // Check for users URLs
 const urlsForUser = function (id) {
   const usersURLs = {};
@@ -70,7 +47,6 @@ const urlsForUser = function (id) {
   }
   return usersURLs;
 };
-
 
 // GET requests
 
@@ -261,7 +237,7 @@ app.post('/register', (req, res) => {
     return res.status(400).send('Invalid email or password entered!');
   }
   // Email already registered
-  else if (findUserByEmail(email)) {
+  else if (findUserByEmail(email, userDatabase)) {
     return res.status(400).send('The email entered is already registered!');
   }
   // Register new user account
@@ -288,12 +264,12 @@ app.post('/login', (req, res) => {
   }
 
   // Email not registered
-  if (!findUserByEmail(email)) {
+  if (!findUserByEmail(email, userDatabase)) {
     return res.status(403).send('The email entered is not registered!');
   }
 
   // Check if email and password combination matches user database
-  const validUser = authenticateUser(email, password);
+  const validUser = authenticateUser(email, password, userDatabase);
   if (!validUser) {
     res.status(403).send("Authentication failed!");
   } else {
