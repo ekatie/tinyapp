@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require('bcryptjs');
 const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
@@ -22,7 +23,7 @@ const userDatabase = {
   aJ48lW: {
     id: "aJ48lW",
     email: "test@gmail.com",
-    password: "test",
+    password: bcrypt.hashSync("test", 10),
   }
 };
 
@@ -31,16 +32,15 @@ const findUserByEmail = function (email) {
   for (const userId in userDatabase) {
     if (userDatabase[userId].email === email) {
       return userDatabase[userId];
-    } else {
-      return null;
     }
   }
+  return null;
 };
 
 // Check for correct email and password combination
 const authenticateUser = function (email, password) {
   for (const userId in userDatabase) {
-    if (userDatabase[userId].email === email && userDatabase[userId].password === password) {
+    if (userDatabase[userId].email === email && bcrypt.compareSync(password, userDatabase[userId].password)) {
       return userDatabase[userId];
     }
   }
@@ -251,6 +251,8 @@ app.post('/urls', (req, res) => {
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  console.log(hashedPassword);
 
   // No email or password entered
   if (!email || !password) {
@@ -266,7 +268,7 @@ app.post('/register', (req, res) => {
     userDatabase[userId] = {
       id: userId,
       email: email,
-      password: password
+      password: hashedPassword
     };
     res.cookie('user_id', userId);
     res.redirect('/urls');
@@ -277,6 +279,7 @@ app.post('/register', (req, res) => {
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  console.log('email:', email, 'pass: ', password, "users: ", userDatabase);
 
   // No email entered
   if (!email) {
