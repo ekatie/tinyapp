@@ -1,12 +1,15 @@
 const express = require("express");
 const bcrypt = require('bcryptjs');
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['omgmyfirstsecretkey', 'thisisbananas', 'ihavesomanysecrets', 'thisisgoingtobesecureashell']
+}));
 
 const urlDatabase = {
   "b2xVn2": {
@@ -84,11 +87,11 @@ app.get('/u/:id', (req, res) => {
 // View page to generate new short URL
 app.get('/urls/new', (req, res) => {
   // User not logged in, redirect user to login page
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     res.redirect('/login');
   } else {
     const templateVars = {
-      user_id: req.cookies.user_id,
+      user_id: req.session.user_id,
       userDatabase
     };
     res.render("urls_new", templateVars);
@@ -98,7 +101,7 @@ app.get('/urls/new', (req, res) => {
 // View single long URL and short URL information
 app.get('/urls/:id', (req, res) => {
   const urlId = req.params.id;
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   const userURLs = urlsForUser(userId);
 
   // User not logged in
@@ -126,11 +129,11 @@ app.get('/urls/:id', (req, res) => {
 // View registration page for new users
 app.get('/register', (req, res) => {
   // Redirect logged in user
-  if (req.cookies.user_id) {
+  if (req.session.user_id) {
     res.redirect('/urls');
   } else {
     const templateVars = {
-      user_id: req.cookies.user_id,
+      user_id: req.session.user_id,
       userDatabase
     };
     res.render('register', templateVars);
@@ -140,11 +143,11 @@ app.get('/register', (req, res) => {
 // View existing user login page
 app.get('/login', (req, res) => {
   // Redirect logged in user
-  if (req.cookies.user_id) {
+  if (req.session.user_id) {
     res.redirect('/urls');
   } else {
     const templateVars = {
-      user_id: req.cookies.user_id,
+      user_id: req.session.user_id,
       userDatabase
     };
     res.render('login', templateVars);
@@ -154,14 +157,14 @@ app.get('/login', (req, res) => {
 // View all short/long URLs
 app.get('/urls', (req, res) => {
   // User not logged in
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     res.send("You must be signed in to view existing URLs!\n");
   } else {
-    const userURLs = urlsForUser(req.cookies.user_id);
+    const userURLs = urlsForUser(req.session.user_id);
 
     const templateVars = {
       urls: userURLs,
-      user_id: req.cookies.user_id,
+      user_id: req.session.user_id,
       userDatabase
     };
     res.render('urls_index', templateVars);
@@ -185,7 +188,7 @@ app.get("/", (req, res) => {
 // Edit existing long URL
 app.post('/urls/:id/edit', (req, res) => {
   const urlId = req.params.id;
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   const userURLs = urlsForUser(userId);
 
   // URL doesn't exist
@@ -208,7 +211,7 @@ app.post('/urls/:id/edit', (req, res) => {
 // Delete existing long URL
 app.post('/urls/:id/delete', (req, res) => {
   const urlId = req.params.id;
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   const userURLs = urlsForUser(userId);
 
   // URL doesn't exist
@@ -231,7 +234,7 @@ app.post('/urls/:id/delete', (req, res) => {
 // Generate new short URL for new long URL
 app.post('/urls', (req, res) => {
   // User not logged in
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     res.send("You must be signed in to use this feature!\n");
   } else {
 
@@ -240,7 +243,7 @@ app.post('/urls', (req, res) => {
 
     urlDatabase[shortURL] = {
       "longURL": longURL,
-      "userId": req.cookies.user_id
+      "userId": req.session.user_id
     };
 
     res.redirect(`/urls/${shortURL}`);
@@ -270,7 +273,7 @@ app.post('/register', (req, res) => {
       email: email,
       password: hashedPassword
     };
-    res.cookie('user_id', userId);
+    req.session.user_id = userId;
     res.redirect('/urls');
   };
 });
@@ -296,14 +299,14 @@ app.post('/login', (req, res) => {
   if (!validUser) {
     res.status(403).send("Authentication failed!");
   } else {
-    res.cookie('user_id', validUser.id);
+    req.session.user_id = validUser.id;
     res.redirect('/urls');
   }
 });
 
 // Logout of account
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/login');
 });
 
