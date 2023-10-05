@@ -255,7 +255,6 @@ app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  console.log(hashedPassword);
 
   // No email or password entered
   if (!email || !password) {
@@ -282,7 +281,6 @@ app.post('/register', (req, res) => {
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  console.log('email:', email, 'pass: ', password, "users: ", userDatabase);
 
   // No email entered
   if (!email) {
