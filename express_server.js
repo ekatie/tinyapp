@@ -25,12 +25,14 @@ const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
     userId: "aJ48lW",
-    visitCount: 0
+    visitCount: 0,
+    visitorId: []
   },
   "9sm5xK": {
     longURL: "http://www.google.com",
     userId: "aJ48lW",
-    visitCount: 0
+    visitCount: 0,
+    visitorId: []
   }
 };
 
@@ -61,9 +63,21 @@ app.get('/u/:id', (req, res) => {
   if (!longURL) {
     res.send("Invalid URL!");
   } else {
-    urlDatabase[req.params.id].visitCount++;
-    res.redirect(longURL);
+
+    // Check if user has visited URL previously
+    for (const url in urlDatabase) {
+      const uniqueVisitors = urlDatabase[url].visitorId;
+
+      // If not, add to unique visitors
+      if (!uniqueVisitors.includes(req.session.user_id)) {
+        uniqueVisitors.push(req.session.user_id);
+      }
+    }
   }
+
+  urlDatabase[req.params.id].visitCount++;
+  res.redirect(longURL);
+
 });
 
 // View page to generate new short URL
@@ -73,7 +87,7 @@ app.get('/urls/new', (req, res) => {
     res.redirect('/login');
   } else {
     const templateVars = {
-      user_id: req.session.user_id,
+      'user_id': req.session.user_id,
       userDatabase
     };
     res.render("urls_new", templateVars);
@@ -102,7 +116,9 @@ app.get('/urls/:id', (req, res) => {
       id: urlId,
       longURL: urlDatabase[urlId].longURL,
       visitCount: urlDatabase[urlId].visitCount,
-      user_id: userId,
+      visitorId: urlDatabase[urlId].visitorId,
+      uniqueVisitorCount: urlDatabase[urlId].visitorId.length,
+      'user_id': userId,
       userDatabase
     };
     res.render('urls_show', templateVars);
@@ -116,7 +132,7 @@ app.get('/register', (req, res) => {
     res.redirect('/urls');
   } else {
     const templateVars = {
-      user_id: req.session.user_id,
+      'user_id': req.session.user_id,
       userDatabase
     };
     res.render('register', templateVars);
@@ -130,7 +146,7 @@ app.get('/login', (req, res) => {
     res.redirect('/urls');
   } else {
     const templateVars = {
-      user_id: req.session.user_id,
+      'user_id': req.session.user_id,
       userDatabase
     };
     res.render('login', templateVars);
@@ -147,7 +163,7 @@ app.get('/urls', (req, res) => {
 
     const templateVars = {
       urls: userURLs,
-      user_id: req.session.user_id,
+      'user_id': req.session.user_id,
       userDatabase
     };
     res.render('urls_index', templateVars);
