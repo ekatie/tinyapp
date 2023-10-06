@@ -25,12 +25,24 @@ const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
     userId: "aJ48lW",
+    visitors: [
+      // {
+      //   visitorId: 'string'
+      //   visitTimestamp: 'timestamp'
+      // }
+    ],
     visitCount: 0,
     visitorId: []
   },
   "9sm5xK": {
     longURL: "http://www.google.com",
     userId: "aJ48lW",
+    visitors: [
+      // { 
+      // visitorId: 'string'
+      // visitTimestamp: 'timestamp'
+      // }
+    ],
     visitCount: 0,
     visitorId: []
   }
@@ -60,24 +72,31 @@ const urlsForUser = function (id) {
 // Forward to long URL using short URL
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id].longURL;
-  if (!longURL) {
+  const visitor_id = req.session.user_id;
+
+  if (!longURL || !urlDatabase[req.params.id]) {
     res.send("Invalid URL!");
   } else {
+
+    // Add visit to visitor tracking
+    urlDatabase[req.params.id].visitors.push({
+      visitorId: visitor_id,
+      visitTimestamp: new Date(Date.now())
+    });
 
     // Check if user has visited URL previously
     for (const url in urlDatabase) {
       const uniqueVisitors = urlDatabase[url].visitorId;
 
       // If not, add to unique visitors
-      if (!uniqueVisitors.includes(req.session.user_id)) {
-        uniqueVisitors.push(req.session.user_id);
+      if (!uniqueVisitors.includes(visitor_id)) {
+        uniqueVisitors.push(visitor_id);
       }
     }
+
+    urlDatabase[req.params.id].visitCount++;
+    res.redirect(longURL);
   }
-
-  urlDatabase[req.params.id].visitCount++;
-  res.redirect(longURL);
-
 });
 
 // View page to generate new short URL
@@ -112,12 +131,15 @@ app.get('/urls/:id', (req, res) => {
   else if (!userURLs[urlId]) {
     res.send("You do not have access to this URL!\n");
   } else {
+    const urlData = urlDatabase[urlId];
+
     const templateVars = {
       id: urlId,
-      longURL: urlDatabase[urlId].longURL,
-      visitCount: urlDatabase[urlId].visitCount,
-      visitorId: urlDatabase[urlId].visitorId,
-      uniqueVisitorCount: urlDatabase[urlId].visitorId.length,
+      longURL: urlData.longURL,
+      visitCount: urlData.visitCount,
+      visitorId: urlData.visitorId,
+      uniqueVisitorCount: urlData.visitorId?.length || 0,
+      visitors: urlData.visitors,
       'user_id': userId,
       userDatabase
     };
@@ -240,8 +262,11 @@ app.post('/urls', (req, res) => {
     const longURL = req.body.longURL;
 
     urlDatabase[shortURL] = {
-      "longURL": longURL,
-      "userId": req.session.user_id
+      longURL: longURL,
+      userId: req.session.user_id,
+      visitors: [],
+      visitCount: 0,
+      visitorId: []
     };
 
     res.redirect(`/urls/${shortURL}`);
