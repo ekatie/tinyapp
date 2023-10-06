@@ -30,7 +30,6 @@ const findUserByEmail = function (email, database) {
   return null;
 };
 
-// Check for correct email and password combination
 /**
  * This function check if the email and password combination entered by a user match the email and password of an existing account.
  * @param {String} email - Email associated with user acccount.
