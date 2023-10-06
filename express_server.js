@@ -13,7 +13,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
-  keys: ['omgmyfirstsecretkey', 'thisisbananas', 'ihavesomanysecrets', 'thisisgoingtobesecureashell']
+  keys: ['omgmyfirstsecretkey', 'thisisbananas', 'ihavesomanysecrets', 'thisisgoingtobesecureashell', 'supercalifragilisticexpialidocious']
 }));
 
 // Databases
@@ -270,7 +270,7 @@ app.post('/login', (req, res) => {
 
   // Check if email and password combination matches user database
   const validUser = authenticateUser(email, password, userDatabase);
-  
+
   if (!validUser) {
     res.status(403).send("Authentication failed!");
   } else {
