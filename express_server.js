@@ -1,11 +1,13 @@
 const express = require("express");
 const bcrypt = require('bcryptjs');
+var methodOverride = require('method-override');
 const {
   findUserByEmail,
   authenticateUser,
   generateRandomString
 } = require('./helpers');
 const cookieSession = require('cookie-session');
+
 const app = express();
 const PORT = 8080;
 
@@ -15,6 +17,7 @@ app.use(cookieSession({
   name: 'session',
   keys: ['omgmyfirstsecretkey', 'thisisbananas', 'ihavesomanysecrets', 'thisisgoingtobesecureashell', 'supercalifragilisticexpialidocious']
 }));
+app.use(methodOverride('_method'));
 
 // Databases
 
@@ -162,7 +165,7 @@ app.get("/", (req, res) => {
 // POST requests
 
 // Edit existing long URL
-app.post('/urls/:id/edit', (req, res) => {
+app.put('/urls/:id/edit', (req, res) => {
   const urlId = req.params.id;
   const userId = req.session.user_id;
   const userURLs = urlsForUser(userId);
@@ -185,7 +188,7 @@ app.post('/urls/:id/edit', (req, res) => {
 });
 
 // Delete existing long URL
-app.post('/urls/:id/delete', (req, res) => {
+app.delete('/urls/:id/delete', (req, res) => {
   const urlId = req.params.id;
   const userId = req.session.user_id;
   const userURLs = urlsForUser(userId);
@@ -213,7 +216,6 @@ app.post('/urls', (req, res) => {
   if (!req.session.user_id) {
     res.send("You must be signed in to use this feature!\n");
   } else {
-
     const shortURL = generateRandomString();
     const longURL = req.body.longURL;
 
