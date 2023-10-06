@@ -21,10 +21,6 @@
         Short URL ID: <a href="/u/<%= id %>">
           <%= id %>
         </a>
-        <br>
-        Number of Visits: <%= visitCount %>
-          <br>
-          Number of Unique Visits: <%= uniqueVisitorCount %>
       </p>
     </div>
     <div class="card-footer text-muted"></div>
@@ -37,6 +33,41 @@
         <button type="submit" class="btn btn-primary">Submit Update
         </button>
       </form>
+    </div>
+    <div class="card-footer text-muted"></div>
+    <div class="card-body">
+      <h5 class="card-title">Visitor Information</h5>
+      <p class="card-text">
+        Number of Visits:
+        <%= visitCount %>
+          <br>
+          Number of Unique Visits:
+          <%= uniqueVisitorCount %>
+            <h5 class="card-title">Visitor List</h5>
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th scope="col">Visit Number</th>
+                  <th scope="col">Visitor ID</th>
+                  <th scope="col">Visit Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (const visit of visitors) { %>
+                  <tr>
+                    <td>
+                      <%= visitors.indexOf(visit) + 1 %>
+                    </td>
+                    <td>
+                      <%= visit.visitorId %>
+                    </td>
+                    <td>
+                      <%= visit.visitTimestamp %>
+                    </td>
+                    <% } %>
+              </tbody>
+            </table>
+      </p>
     </div>
   </div>
 
