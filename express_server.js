@@ -24,11 +24,13 @@ app.use(methodOverride('_method'));
 const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
-    userId: "aJ48lW"
+    userId: "aJ48lW",
+    visitCount: 0
   },
   "9sm5xK": {
     longURL: "http://www.google.com",
-    userId: "aJ48lW"
+    userId: "aJ48lW",
+    visitCount: 0
   }
 };
 
@@ -59,6 +61,7 @@ app.get('/u/:id', (req, res) => {
   if (!longURL) {
     res.send("Invalid URL!");
   } else {
+    urlDatabase[req.params.id].visitCount++;
     res.redirect(longURL);
   }
 });
@@ -98,6 +101,7 @@ app.get('/urls/:id', (req, res) => {
     const templateVars = {
       id: urlId,
       longURL: urlDatabase[urlId].longURL,
+      visitCount: urlDatabase[urlId].visitCount,
       user_id: userId,
       userDatabase
     };
