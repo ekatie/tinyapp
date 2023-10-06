@@ -270,6 +270,7 @@ app.post('/login', (req, res) => {
 
   // Check if email and password combination matches user database
   const validUser = authenticateUser(email, password, userDatabase);
+  
   if (!validUser) {
     res.status(403).send("Authentication failed!");
   } else {
