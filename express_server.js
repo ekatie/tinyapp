@@ -101,10 +101,11 @@ app.get('/u/:id', (req, res) => {
 
 // View page to generate new short URL
 app.get('/urls/new', (req, res) => {
-  // User not logged in, redirect user to login page
+  // User not logged in, redirect to login page
   if (!req.session.user_id) {
     res.redirect('/login');
   } else {
+    // Display create new URL page
     const templateVars = {
       'user_id': req.session.user_id,
       userDatabase
@@ -113,7 +114,7 @@ app.get('/urls/new', (req, res) => {
   }
 });
 
-// View single long URL and short URL information
+// View single long URL and short URL record
 app.get('/urls/:id', (req, res) => {
   const urlId = req.params.id;
   const userId = req.session.user_id;
@@ -131,6 +132,7 @@ app.get('/urls/:id', (req, res) => {
   else if (!userURLs[urlId]) {
     res.send("You do not have access to this URL!\n");
   } else {
+    // Display URL record
     const urlData = urlDatabase[urlId];
 
     const templateVars = {
@@ -175,14 +177,14 @@ app.get('/login', (req, res) => {
   }
 });
 
-// View all short/long URLs
+// View list of all short/long URLs
 app.get('/urls', (req, res) => {
   // User not logged in
   if (!req.session.user_id) {
     res.send("You must be signed in to view existing URLs!\n");
   } else {
+    // Find and display users URLs
     const userURLs = urlsForUser(req.session.user_id);
-
     const templateVars = {
       urls: userURLs,
       'user_id': req.session.user_id,
@@ -201,7 +203,11 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (!req.session.user_id) {
+    res.redirect('login');
+  } else {
+    res.redirect('urls');
+  }
 });
 
 // POST requests
@@ -224,6 +230,7 @@ app.put('/urls/:id/edit', (req, res) => {
   else if (!userURLs[urlId]) {
     res.send("You do not have permission to edit this URL!\n");
   } else {
+    // Update long URL
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect('/urls');
   }
@@ -258,6 +265,7 @@ app.post('/urls', (req, res) => {
   if (!req.session.user_id) {
     res.send("You must be signed in to use this feature!\n");
   } else {
+    // Generate new short URL and add to url database with userID
     const shortURL = generateRandomString();
     const longURL = req.body.longURL;
 
@@ -277,7 +285,6 @@ app.post('/urls', (req, res) => {
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const hashedPassword = bcrypt.hashSync(password, 10);
 
   // No email or password entered
   if (!email || !password) {
@@ -290,6 +297,7 @@ app.post('/register', (req, res) => {
   // Register new user account
   else {
     const userId = generateRandomString();
+    const hashedPassword = bcrypt.hashSync(password, 10);
     userDatabase[userId] = {
       id: userId,
       email: email,
@@ -306,15 +314,13 @@ app.post('/login', (req, res) => {
   const password = req.body.password;
 
   // No email entered
-  if (!email) {
-    return res.status(403).send('Invalid email address!');
+  if (!email || !password) {
+    return res.status(403).send('Invalid email or password entered!');
   }
-
   // Email not registered
   if (!findUserByEmail(email, userDatabase)) {
     return res.status(403).send('The email entered is not registered!');
   }
-
   // Check if email and password combination matches user database
   const validUser = authenticateUser(email, password, userDatabase);
 
