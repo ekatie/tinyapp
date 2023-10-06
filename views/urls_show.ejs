@@ -26,7 +26,7 @@
     <div class="card-footer text-muted"></div>
     <div class="card-body">
       <h5 class="card-title">Edit URL</h5>
-      <form method="POST" action="/urls/<%= id%>/edit">
+      <form method="POST" action="/urls/<%= id%>/edit?_method=PUT">
         <label>New URL:
           <input type="text" value="<%= longURL %>" name="longURL" label="New URL" placeholder="<%= longURL %>"
             style="width: 300px"></label>
