@@ -46,8 +46,24 @@ const authenticateUser = function (email, password, database) {
   return false;
 };
 
+// Get current date
+const getCurrentDate = function () {
+  const timestamp = new Date();
+  const year = timestamp.getFullYear();
+  const monthNames = [
+    'January', 'February', 'March', 'April',
+    'May', 'June', 'July', 'August',
+    'September', 'October', 'November', 'December'
+  ];
+  const month = monthNames[timestamp.getMonth()];
+  const day = timestamp.getDate();
+
+  return `${month} ${day}, ${year}`;
+};
+
 module.exports = {
   findUserByEmail,
   authenticateUser,
-  generateRandomString
+  generateRandomString,
+  getCurrentDate
 };
