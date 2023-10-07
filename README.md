@@ -4,21 +4,27 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Functional Details
 
-- Users can register to generate their own short URLs
-- URLs are private - only visible to the user who created them
-- Signed in users can: generate, view, edit and delete URLs
+- Users can register to access functions available to signed in users.
+- Signed in users can: 
+  - BROWSE: a list of their short URLs
+  - READ: detailed URL information, including creation date and visitor tracking data
+  - EDIT: long URLs asssociated with existing short URLs
+  - ADD: new short URLs
+  - DELETE: generated URLs
 - Tracking of visits to short URLs:
   - Total number of visits
   - Number of unique visits
   - List of visits by visitor ID and timestamp for visit
+- Permissions:
+  - Generated short URLs and visitor tracking data are private (only visible to the user who created them)
 
 ## Final Product
 
-!["User registration page"](/screenshots/Register.png)
-!["User login page"](/screenshots/Login.png)
-!["Create New Tiny URL page"](/screenshots/CreateTinyURL.png)
-!["List of URLs for user"](/screenshots/MyURLs.png)
-!["URL details page, including tracking of visits"](/screenshots/URLDetails.png)
+!["Screenshot of user registration page"](/screenshots/Register.png)
+!["Screenshot of user login page"](/screenshots/Login.png)
+!["Screenshot of Create New Tiny URL page"](/screenshots/CreateTinyURL.png)
+!["Screenshot of URLs List for user"](/screenshots/MyURLs.png)
+!["Screenshot of URL details page"](/screenshots/URLDetails.png)
 
 ## Dependencies
 
