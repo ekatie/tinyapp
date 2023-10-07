@@ -16,6 +16,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 !["User registration page"](/screenshots/Register.png)
 !["User login page"](/screenshots/Login.png)
+!["Create New Tiny URL page"](/screenshots/CreateTinyURL.png)
 !["List of URLs for user"](/screenshots/MyURLs.png)
 !["URL details page, including tracking of visits"](/screenshots/URLDetails.png)
 
