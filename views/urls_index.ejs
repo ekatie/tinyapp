@@ -22,6 +22,7 @@
         <tr>
           <th scope="col">Short URL ID</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Creation Date</th>
           <th scope="col">Edit URL</th>
           <th scope="col">Delete</th>
         </tr>
@@ -34,6 +35,9 @@
             </td>
             <td>
               <%= urls[id].longURL %>
+            </td>
+            <td>
+              <%= urls[id].creationDate %>
             </td>
             <td>
               <a href="/urls/<%= id %>" class="btn btn-outline-primary">Edit</a>
