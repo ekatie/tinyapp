@@ -25,7 +25,9 @@ const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
     userId: "aJ48lW",
+    creationDate: 'October 7, 2023',
     visitors: [
+      // Sample data : 
       // {
       //   visitorId: 'string'
       //   visitTimestamp: 'timestamp'
@@ -37,11 +39,8 @@ const urlDatabase = {
   "9sm5xK": {
     longURL: "http://www.google.com",
     userId: "aJ48lW",
+    creationDate: 'August 21, 2023',
     visitors: [
-      // { 
-      // visitorId: 'string'
-      // visitTimestamp: 'timestamp'
-      // }
     ],
     visitCount: 0,
     visitorId: []
@@ -67,6 +66,21 @@ const urlsForUser = function (id) {
   return usersURLs;
 };
 
+// Get current date
+const getCurrentDate = function () {
+  const timestamp = new Date();
+  const year = timestamp.getFullYear();
+  const monthNames = [
+    'January', 'February', 'March', 'April',
+    'May', 'June', 'July', 'August',
+    'September', 'October', 'November', 'December'
+  ];
+  const month = monthNames[timestamp.getMonth()];
+  const day = timestamp.getDate();
+
+  return `${month} ${day}, ${year}`;
+};
+
 // GET requests
 
 // Forward to long URL using short URL
@@ -81,7 +95,7 @@ app.get('/u/:id', (req, res) => {
     // Add visit to visitor tracking
     urlDatabase[req.params.id].visitors.push({
       visitorId: visitor_id,
-      visitTimestamp: new Date(Date.now())
+      visitTimestamp: new Date()
     });
 
     // Check if user has visited URL previously
@@ -138,6 +152,7 @@ app.get('/urls/:id', (req, res) => {
     const templateVars = {
       id: urlId,
       longURL: urlData.longURL,
+      creationDate: urlData.creationDate,
       visitCount: urlData.visitCount,
       visitorId: urlData.visitorId,
       uniqueVisitorCount: urlData.visitorId?.length || 0,
@@ -272,6 +287,7 @@ app.post('/urls', (req, res) => {
     urlDatabase[shortURL] = {
       longURL: longURL,
       userId: req.session.user_id,
+      creationDate: getCurrentDate(),
       visitors: [],
       visitCount: 0,
       visitorId: []
