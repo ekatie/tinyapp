@@ -4,7 +4,8 @@ var methodOverride = require('method-override');
 const {
   findUserByEmail,
   authenticateUser,
-  generateRandomString
+  generateRandomString,
+  getCurrentDate
 } = require('./helpers');
 const cookieSession = require('cookie-session');
 
@@ -19,20 +20,13 @@ app.use(cookieSession({
 }));
 app.use(methodOverride('_method'));
 
-// Databases
-
+// DATABASES
 const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
     userId: "aJ48lW",
     creationDate: 'October 7, 2023',
-    visitors: [
-      // Sample data : 
-      // {
-      //   visitorId: 'string'
-      //   visitTimestamp: 'timestamp'
-      // }
-    ],
+    visitors: [],
     visitCount: 0,
     visitorId: []
   },
@@ -40,8 +34,7 @@ const urlDatabase = {
     longURL: "http://www.google.com",
     userId: "aJ48lW",
     creationDate: 'August 21, 2023',
-    visitors: [
-    ],
+    visitors: [],
     visitCount: 0,
     visitorId: []
   }
@@ -66,22 +59,7 @@ const urlsForUser = function (id) {
   return usersURLs;
 };
 
-// Get current date
-const getCurrentDate = function () {
-  const timestamp = new Date();
-  const year = timestamp.getFullYear();
-  const monthNames = [
-    'January', 'February', 'March', 'April',
-    'May', 'June', 'July', 'August',
-    'September', 'October', 'November', 'December'
-  ];
-  const month = monthNames[timestamp.getMonth()];
-  const day = timestamp.getDate();
-
-  return `${month} ${day}, ${year}`;
-};
-
-// GET requests
+// GET REQUESTS
 
 // Forward to long URL using short URL
 app.get('/u/:id', (req, res) => {
@@ -119,7 +97,7 @@ app.get('/urls/new', (req, res) => {
   if (!req.session.user_id) {
     res.redirect('/login');
   } else {
-    // Display create new URL page
+    // Display generate new URL page
     const templateVars = {
       'user_id': req.session.user_id,
       userDatabase
@@ -225,7 +203,7 @@ app.get("/", (req, res) => {
   }
 });
 
-// POST requests
+// POST REQUESTS
 
 // Edit existing long URL
 app.put('/urls/:id/edit', (req, res) => {
@@ -251,7 +229,7 @@ app.put('/urls/:id/edit', (req, res) => {
   }
 });
 
-// Delete existing long URL
+// Delete existing URL
 app.delete('/urls/:id/delete', (req, res) => {
   const urlId = req.params.id;
   const userId = req.session.user_id;
@@ -269,12 +247,13 @@ app.delete('/urls/:id/delete', (req, res) => {
   else if (!userURLs[urlId]) {
     res.send("You do not have permission to delete this URL!\n");
   } else {
+    // Delete URL
     delete urlDatabase[req.body.id];
     res.redirect('/urls');
   }
 });
 
-// Generate new short URL for new long URL
+// Generate short URL for new long URL
 app.post('/urls', (req, res) => {
   // User not logged in
   if (!req.session.user_id) {
@@ -297,7 +276,7 @@ app.post('/urls', (req, res) => {
   }
 });
 
-// Register a new user account
+// Register new user account
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -329,7 +308,7 @@ app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  // No email entered
+  // No email or password entered
   if (!email || !password) {
     return res.status(403).send('Invalid email or password entered!');
   }
