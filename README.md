@@ -4,11 +4,10 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Functional Details
 
-- Users register to generate short URLs
-- URLs are only visible to the user who created them
-- User must be signed in to view their URL list
-- Users can edit or delete their URLs
-- Tracking of visits to short URL:
+- Users can register to generate their own short URLs
+- URLs are private - only visible to the user who created them
+- Signed in users can: generate, view, edit and delete URLs
+- Tracking of visits to short URLs:
   - Total number of visits
   - Number of unique visits
   - List of visits by visitor ID and timestamp for visit
